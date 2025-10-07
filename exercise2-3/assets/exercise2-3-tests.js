@@ -33,11 +33,12 @@ async function runTests(canvas) {
         const hasMouseDragged = window.hasOwnProperty("mouseDragged");
         const hasMouseReleased = window.hasOwnProperty("mouseReleased");
         if (!hasMouseDragged) {
-            TestResults.addFail("The requirements cannot be met without using mouse event functions (rather than the <code>mouseIsPressed</code> system variable). You will need to implement <code>mouseDragged()</code> to complete this exercise.");
+            TestResults.addFail("Although the output may look correct, the requirements call for use of the mouse event functions (rather than the <code>mouseIsPressed</code> system variable). You will need to implement at least <code>mouseDragged()</code> to complete this exercise.");
         } else {
             // The mouse is pressed on the shape
-            const beforeX1 = lastShapes[0].x + lastShapes[0].w / 2;
-            const beforeY1 = lastShapes[0].y + lastShapes[0].h / 2;
+            const coords = lastShapes[0].getLocationInMode("CENTER");
+            const beforeX1 = coords[0];//lastShapes[0].x + lastShapes[0].w / 2;
+            const beforeY1 = coords[0];//lastShapes[0].y + lastShapes[0].h / 2;
             mouseX = beforeX1;
             mouseY = beforeY1;
             mouseIsPressed = true;
@@ -53,18 +54,24 @@ async function runTests(canvas) {
             mouseY += 5;
             mouseDragged();
             advanceToFrame(frameCount + 1);
+            const shapesAfterDrag = getShapes();
+            // drag
+            mouseX += 5;
+            mouseY += 5;
+            mouseDragged();
+            advanceToFrame(frameCount + 1);
             for (const e of canvasStatus.errors) {
                 TestResults.addFail(`In frame ${frameCount}, ${e}`);
             }
-            const shapesAfterDrag = getShapes();
-            if (shapesAfterDrag.length !== 1) {
-                TestResults.addFail(`Expected one shape after dragging the mouse. Found ${shapesAfterDrag.length}.`);
+            const shapesAfterSecondDrag = getShapes();
+            if (shapesAfterSecondDrag.length !== 1) {
+                TestResults.addFail(`Expected one shape after dragging the mouse. Found ${shapesAfterSecondDrag.length}.`);
             } else {
                 // The shape has moved
-                if (shapesAfterDrag[0].x - lastShapes[0].x === 5 && shapesAfterDrag[0].y - lastShapes[0].y === 5) {
+                if (shapesAfterSecondDrag[0].x - shapesAfterDrag[0].x === 5 && shapesAfterSecondDrag[0].y - shapesAfterDrag[0].y === 5) {
                     TestResults.addPass("The shape moved by the expected amount when the mouse dragged by 5, 5.")
                 } else {
-                    TestResults.addFail(`Expected the shape to move 5, 5 when the mouse dragged 5, 5. Your shape moved ${shapesAfterDrag[0].x - lastShapes[0].x}, ${shapesAfterDrag[0].y - lastShapes[0].y}.`);
+                    TestResults.addFail(`Expected the shape to move 5, 5 when the mouse dragged 5, 5. Your shape moved ${shapesAfterSecondDrag[0].x - shapesAfterDrag[0].x}, ${shapesAfterSecondDrag[0].y - shapesAfterDrag[0].y}.`);
                 }
                 // The shape has changed colour
                 if (coloursMatch(shapesAfterDrag[0].fillColour, lastShapes[0].fillColour)) {
@@ -89,7 +96,7 @@ async function runTests(canvas) {
                 TestResults.addFail(`Expected one shape when the drag is finished. Found ${shapeRelease.length}.`);
             } else {
                 // Stop moving
-                if (shapesAfterDrag[0].x === shapeRelease[0].x && shapesAfterDrag[0].y === shapeRelease[0].y) {
+                if (shapesAfterSecondDrag[0].x === shapeRelease[0].x && shapesAfterSecondDrag[0].y === shapeRelease[0].y) {
                     TestResults.addPass("The shape stops moving when the mouse is released.");
                 } else {
                     TestResults.addFail("The shape continued moving when the mouse was released.");

@@ -21,7 +21,7 @@ function boundingBoxMovement(code, keyName, xChange, yChange, beforeShape) {
     // Get shape
     const afterShapes = getShapes();
     if (afterShapes.length !== 1) {
-        TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}.`);
+        TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}. Did you forget to call background() in draw()?`);
     }
     else {
         // Check position
@@ -71,7 +71,7 @@ function triangleMovement(code, keyName, xChange, yChange, beforeShape) {
         // Get shape
         const afterShapes = getShapes();
         if (afterShapes.length !== 1) {
-            TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}.`);
+            TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}. Did you forget to call background() in draw()?`);
         }
         else if (afterShapes[0].type !== TRIANGLE) {
             TestResults.addFail(`When the ${keyName} key was pressed the triangle became a ${afterShapes[0].type}.`);
@@ -107,7 +107,7 @@ function lineMovement(code, keyName, xChange, yChange, beforeShape) {
         // Get shape
         const afterShapes = getShapes();
         if (afterShapes.length !== 1) {
-            TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}.`);
+            TestResults.addFail(`Expected one shape after pressing the ${keyName} key. Found ${afterShapes.length}. Did you forget to call background() in draw()?`);
         }
         else if (afterShapes[0].type !== LINE) {
             TestResults.addFail(`When the ${keyName} key was pressed the line became a ${afterShapes[0].type}.`);
@@ -160,14 +160,18 @@ async function runTests(canvas) {
     if (lastShapes.length !== 1) {
         TestResults.addFail(`Expected 1 shape when the sketch first loads. Found ${lastShapes.length}.`);
     } else {
-        checkMovement("w".charCodeAt(0), "w", 0, -5);
-        checkMovement("s".charCodeAt(0), "s", 0, 5);
-        checkMovement("a".charCodeAt(0), "a", -5, 0);
-        checkMovement("d".charCodeAt(0), "d", 5, 0);
-        checkMovement(UP_ARROW, "UP arrow", 0, -5);
-        checkMovement(DOWN_ARROW, "DOWN arrow", 0, 5);
-        checkMovement(LEFT_ARROW, "LEFT arrow", -5, 0);
-        checkMovement(RIGHT_ARROW, "RIGHT arrow", 5, 0);
+        try {
+            checkMovement("w".charCodeAt(0), "w", 0, -5);
+            checkMovement("s".charCodeAt(0), "s", 0, 5);
+            checkMovement("a".charCodeAt(0), "a", -5, 0);
+            checkMovement("d".charCodeAt(0), "d", 5, 0);
+            checkMovement(UP_ARROW, "UP arrow", 0, -5);
+            checkMovement(DOWN_ARROW, "DOWN arrow", 0, 5);
+            checkMovement(LEFT_ARROW, "LEFT arrow", -5, 0);
+            checkMovement(RIGHT_ARROW, "RIGHT arrow", 5, 0);
+        } catch (e) {
+            TestResults.addFail("Unable to test shape movement. Has keyPressed() been implemented?");
+        }
         // check bounds
     }
     TestResults.display(resultsDiv);
